@@ -15,7 +15,6 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import students from '@/routes/students';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -23,11 +22,6 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
-    },
-    {
-        title: 'Students',
-        href: students.index(),
-        icon: BookOpen,
     },
 ];
 
