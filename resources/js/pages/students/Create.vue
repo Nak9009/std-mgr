@@ -2,8 +2,16 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
 import { dashboard } from '@/routes';
-import type { PaginatedStudents, Student } from '@/types';
 import * as studentsRoutes from '@/routes/students';
+import { Input } from '@/components/ui/input';
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
 
 const form = useForm({
     first_name: '',
@@ -30,17 +38,6 @@ defineOptions({
         ],
     },
 });
-
-function destroy(student: Student) {
-    if (
-        !confirm(
-            `Are you sure you want to delete ${student.first_name} ${student.last_name}?`,
-        )
-    ) {
-        return;
-    }
-    router.delete(studentsRoutes.destroy(student.id).url);
-}
 </script>
 
 <template>
@@ -51,6 +48,18 @@ function destroy(student: Student) {
     >
         <h1 class="text-2xl font-semibold">Add Student</h1>
 
+        <FormField v-slot="{ componentField }" name="first_name">
+            <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                    <Input v-model="form.first_name" />
+                </FormControl>
+                <FormDescription>
+                    This is your public display name.
+                </FormDescription>
+                <FormMessage />
+            </FormItem>
+        </FormField>
         <form class="space-y-4" @submit.prevent="submit">
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
