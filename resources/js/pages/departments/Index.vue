@@ -15,7 +15,7 @@ import { ref } from 'vue';
 import { watchDebounced } from '@vueuse/core';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Search, Trash, Edit } from '@lucide/vue';
+import { MoreHorizontal, Search, Trash, Edit, Filter, ArrowDownAZ, ArrowDownZA, Clock } from '@lucide/vue';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,14 +41,24 @@ const props = defineProps<{
 }>();
 
 const search = ref(props.filters?.search ?? '');
+const sort = ref(props.filters?.sort ?? 'newest');
 
 watchDebounced(search, (value) => {
     router.get(
         departmentsRoutes.index().url,
-        { search: value },
+        { search: value, sort: sort.value },
         { preserveState: true, replace: true }
     );
 }, { debounce: 300 });
+
+import { watch } from 'vue';
+watch(sort, (value) => {
+    router.get(
+        departmentsRoutes.index().url,
+        { search: search.value, sort: value },
+        { preserveState: true, replace: true }
+    );
+});
 
 const deleteDialogOpen = ref(false);
 const departmentToDelete = ref<Department | null>(null);
@@ -96,9 +106,34 @@ defineOptions({
                     class="pl-8"
                 />
             </div>
-            <Button variant="outline">
-                Filter
-            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                    <Button variant="outline" class="gap-2">
+                        <Filter class="h-4 w-4" />
+                        Filter & Sort
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-48">
+                    <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                    <DropdownMenuItem @click="sort = 'newest'" :class="{ 'bg-muted': sort === 'newest' }">
+                        <Clock class="mr-2 h-4 w-4" />
+                        Newest
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="sort = 'oldest'" :class="{ 'bg-muted': sort === 'oldest' }">
+                        <Clock class="mr-2 h-4 w-4" />
+                        Oldest
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem @click="sort = 'name_asc'" :class="{ 'bg-muted': sort === 'name_asc' }">
+                        <ArrowDownAZ class="mr-2 h-4 w-4" />
+                        Name (A-Z)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem @click="sort = 'name_desc'" :class="{ 'bg-muted': sort === 'name_desc' }">
+                        <ArrowDownZA class="mr-2 h-4 w-4" />
+                        Name (Z-A)
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
 
         <div class="rounded-md border">

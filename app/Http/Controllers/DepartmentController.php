@@ -17,19 +17,23 @@ class DepartmentController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $search = $request->input('search');
+        $sort = $request->input('sort', 'newest'); // default sort
 
         $departments = Department::query()
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             })
-            ->latest()
+            ->when($sort === 'oldest', fn ($q) => $q->oldest())
+            ->when($sort === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($sort === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($sort === 'newest', fn ($q) => $q->latest())
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('departments/Index', [
             'departments' => $departments,
-            'filters' => $request->only(['search']),
+            'filters' => $request->only(['search', 'sort']),
         ]);
     }
 
