@@ -14,12 +14,22 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $departments = Department::query()->paginate(10);
-        // dd($departments);
+        $search = $request->input('search');
+
+        $departments = Department::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('departments/Index', [
             'departments' => $departments,
+            'filters' => $request->only(['search']),
         ]);
     }
 
