@@ -67,12 +67,6 @@ watch(keywords, () => {
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
-        <StudentCard
-            v-for="student in students"
-            :key="student.name"
-            :name="student.name"
-            :score="student.score"
-        />
         <input v-model="keywords" class="rounded border" />
         <h1>{{ fullName }}</h1>
         <p v-if="loggedIn">LoggedIn</p>
