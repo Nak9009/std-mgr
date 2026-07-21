@@ -15,7 +15,16 @@ import { ref } from 'vue';
 import { watchDebounced } from '@vueuse/core';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Search, Trash, Edit, Filter, ArrowDownAZ, ArrowDownZA, Clock } from '@lucide/vue';
+import {
+    MoreHorizontal,
+    Search,
+    Trash,
+    Edit,
+    Filter,
+    ArrowDownAZ,
+    ArrowDownZA,
+    Clock,
+} from '@lucide/vue';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,20 +52,24 @@ const props = defineProps<{
 const search = ref(props.filters?.search ?? '');
 const sort = ref(props.filters?.sort ?? 'newest');
 
-watchDebounced(search, (value) => {
-    router.get(
-        departmentsRoutes.index().url,
-        { search: value, sort: sort.value },
-        { preserveState: true, replace: true }
-    );
-}, { debounce: 300 });
+watchDebounced(
+    search,
+    (value) => {
+        router.get(
+            departmentsRoutes.index().url,
+            { search: value, sort: sort.value },
+            { preserveState: true, replace: true },
+        );
+    },
+    { debounce: 300 },
+);
 
 import { watch } from 'vue';
 watch(sort, (value) => {
     router.get(
         departmentsRoutes.index().url,
         { search: search.value, sort: value },
-        { preserveState: true, replace: true }
+        { preserveState: true, replace: true },
     );
 });
 
@@ -74,7 +87,7 @@ function destroy() {
         onSuccess: () => {
             deleteDialogOpen.value = false;
             departmentToDelete.value = null;
-        }
+        },
     });
 }
 
@@ -96,9 +109,16 @@ defineOptions({
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
+        <div class="flex items-center justify-end">
+            <Link :href="departmentsRoutes.create().url">
+                <Button variant="outline"> Create </Button>
+            </Link>
+        </div>
         <div class="flex items-center justify-between">
             <div class="relative w-full max-w-sm items-center">
-                <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search
+                    class="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground"
+                />
                 <Input
                     v-model="search"
                     type="search"
@@ -115,20 +135,32 @@ defineOptions({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48">
                     <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-                    <DropdownMenuItem @click="sort = 'newest'" :class="{ 'bg-muted': sort === 'newest' }">
+                    <DropdownMenuItem
+                        @click="sort = 'newest'"
+                        :class="{ 'bg-muted': sort === 'newest' }"
+                    >
                         <Clock class="mr-2 h-4 w-4" />
                         Newest
                     </DropdownMenuItem>
-                    <DropdownMenuItem @click="sort = 'oldest'" :class="{ 'bg-muted': sort === 'oldest' }">
+                    <DropdownMenuItem
+                        @click="sort = 'oldest'"
+                        :class="{ 'bg-muted': sort === 'oldest' }"
+                    >
                         <Clock class="mr-2 h-4 w-4" />
                         Oldest
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="sort = 'name_asc'" :class="{ 'bg-muted': sort === 'name_asc' }">
+                    <DropdownMenuItem
+                        @click="sort = 'name_asc'"
+                        :class="{ 'bg-muted': sort === 'name_asc' }"
+                    >
                         <ArrowDownAZ class="mr-2 h-4 w-4" />
                         Name (A-Z)
                     </DropdownMenuItem>
-                    <DropdownMenuItem @click="sort = 'name_desc'" :class="{ 'bg-muted': sort === 'name_desc' }">
+                    <DropdownMenuItem
+                        @click="sort = 'name_desc'"
+                        :class="{ 'bg-muted': sort === 'name_desc' }"
+                    >
                         <ArrowDownZA class="mr-2 h-4 w-4" />
                         Name (Z-A)
                     </DropdownMenuItem>
@@ -142,7 +174,9 @@ defineOptions({
                     <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead class="w-[150px] text-right">Actions</TableHead>
+                        <TableHead class="w-[150px] text-right"
+                            >Actions</TableHead
+                        >
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -150,7 +184,9 @@ defineOptions({
                         v-for="department in props.departments.data"
                         :key="department.id"
                     >
-                        <TableCell class="font-medium">{{ department.name }}</TableCell>
+                        <TableCell class="font-medium">{{
+                            department.name
+                        }}</TableCell>
                         <TableCell>{{ department.description }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
@@ -161,15 +197,26 @@ defineOptions({
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuLabel
+                                        >Actions</DropdownMenuLabel
+                                    >
                                     <DropdownMenuItem as-child>
-                                        <Link :href="departmentsRoutes.edit(department.id).url">
+                                        <Link
+                                            :href="
+                                                departmentsRoutes.edit(
+                                                    department.id,
+                                                ).url
+                                            "
+                                        >
                                             <Edit class="mr-2 h-4 w-4" />
                                             Edit
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem @click="confirmDelete(department)" class="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                    <DropdownMenuItem
+                                        @click="confirmDelete(department)"
+                                        class="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                                    >
                                         <Trash class="mr-2 h-4 w-4" />
                                         Delete
                                     </DropdownMenuItem>
@@ -178,7 +225,10 @@ defineOptions({
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="props.departments.data.length === 0">
-                        <TableCell colspan="3" class="h-24 text-center text-muted-foreground">
+                        <TableCell
+                            colspan="3"
+                            class="h-24 text-center text-muted-foreground"
+                        >
                             No departments found.
                         </TableCell>
                     </TableRow>
@@ -204,15 +254,27 @@ defineOptions({
         <AlertDialog v-model:open="deleteDialogOpen">
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle
+                        >Are you absolutely sure?</AlertDialogTitle
+                    >
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the 
-                        <span class="font-bold">{{ departmentToDelete?.name }}</span> department.
+                        This action cannot be undone. This will permanently
+                        delete the
+                        <span class="font-bold">{{
+                            departmentToDelete?.name
+                        }}</span>
+                        department.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel @click="deleteDialogOpen = false">Cancel</AlertDialogCancel>
-                    <AlertDialogAction @click="destroy" class="bg-red-600 focus:ring-red-600">Delete</AlertDialogAction>
+                    <AlertDialogCancel @click="deleteDialogOpen = false"
+                        >Cancel</AlertDialogCancel
+                    >
+                    <AlertDialogAction
+                        @click="destroy"
+                        class="bg-red-600 focus:ring-red-600"
+                        >Delete</AlertDialogAction
+                    >
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
