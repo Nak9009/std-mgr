@@ -57,6 +57,9 @@ defineOptions({
 function submit() {
     form.transform((data) => ({ ...data, _method: 'put' })).post(
         studentsRoutes.update(props.student.id).url,
+        {
+            forceFormData: true,
+        }
     );
 }
 </script>

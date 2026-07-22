@@ -35,7 +35,9 @@ function onPhotoChange(event: Event) {
 }
 
 function submit() {
-    form.post(studentsRoutes.store().url);
+    form.post(studentsRoutes.store().url, {
+        forceFormData: true,
+    });
 }
 
 defineOptions({
