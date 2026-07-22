@@ -38,6 +38,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, Search } from '@lucide/vue';
 
@@ -81,15 +91,22 @@ defineOptions({
     },
 });
 
-function destroy(student: Student) {
-    if (
-        !confirm(
-            `Are you sure you want to delete ${student.first_name} ${student.last_name}?`,
-        )
-    ) {
-        return;
-    }
-    router.delete(studentsRoutes.destroy(student.id).url);
+const isDeleteDialogOpen = ref(false);
+const studentToDelete = ref<Student | null>(null);
+
+function confirmDestroy(student: Student) {
+    studentToDelete.value = student;
+    isDeleteDialogOpen.value = true;
+}
+
+function destroyStudent() {
+    if (!studentToDelete.value) return;
+    router.delete(studentsRoutes.destroy(studentToDelete.value.id).url, {
+        onSuccess: () => {
+            isDeleteDialogOpen.value = false;
+            studentToDelete.value = null;
+        },
+    });
 }
 </script>
 
@@ -222,7 +239,7 @@ function destroy(student: Student) {
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
-                                        @click="destroy(student)"
+                                        @click="confirmDestroy(student)"
                                         class="text-destructive focus:text-destructive"
                                     >
                                         Delete
@@ -290,5 +307,25 @@ function destroy(student: Student) {
                 </template>
             </PaginationContent>
         </Pagination>
+
+        <AlertDialog :open="isDeleteDialogOpen" @update:open="isDeleteDialogOpen = $event">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete 
+                        <span v-if="studentToDelete" class="font-semibold text-foreground">
+                            {{ studentToDelete.first_name }} {{ studentToDelete.last_name }}
+                        </span>.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
+                    <AlertDialogAction @click="destroyStudent" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Continue
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>
