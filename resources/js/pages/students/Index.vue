@@ -50,6 +50,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, Search } from '@lucide/vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
     students: PaginatedStudents;
@@ -105,6 +106,7 @@ function destroyStudent() {
         onSuccess: () => {
             isDeleteDialogOpen.value = false;
             studentToDelete.value = null;
+            toast.success('Student deleted successfully');
         },
     });
 }

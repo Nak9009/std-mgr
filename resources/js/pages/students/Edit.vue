@@ -4,6 +4,7 @@ import { dashboard } from '@/routes';
 import type { PaginatedStudents, Student } from '@/types';
 import * as studentsRoutes from '@/routes/students';
 import StudentForm from './partials/StudentForm.vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
     student: Student;
@@ -49,6 +50,9 @@ function submit() {
         studentsRoutes.update(props.student.id).url,
         {
             forceFormData: true,
+            onSuccess: () => {
+                toast.success('Student updated successfully');
+            },
         }
     );
 }

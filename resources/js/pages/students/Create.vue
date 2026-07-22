@@ -4,6 +4,7 @@ import { useForm } from '@inertiajs/vue3';
 import { dashboard } from '@/routes';
 import * as studentsRoutes from '@/routes/students';
 import StudentForm from './partials/StudentForm.vue';
+import { toast } from 'vue-sonner';
 
 const form = useForm({
     first_name: '',
@@ -20,6 +21,9 @@ const form = useForm({
 function submit() {
     form.post(studentsRoutes.store().url, {
         forceFormData: true,
+        onSuccess: () => {
+            toast.success('Student created successfully');
+        },
     });
 }
 
