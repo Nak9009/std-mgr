@@ -3,6 +3,23 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { dashboard } from '@/routes';
 import type { PaginatedStudents, Student } from '@/types';
 import * as studentsRoutes from '@/routes/students';
+import Button from '@/components/ui/button/Button.vue';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination';
 
 const props = defineProps<{
     students: PaginatedStudents;
@@ -12,8 +29,8 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Dashboard',
-                href: dashboard(),
+                title: 'Student',
+                href: studentsRoutes.index().url,
             },
         ],
     },
@@ -45,31 +62,32 @@ function destroy(student: Student) {
         </div>
 
         <div class="overflow-x-auto rounded-lg border">
-            <table class="w-full text-sm">
-                <thead class="bg-muted/50 text-left">
-                    <tr>
-                        <th class="p-3">Student ID</th>
-                        <th class="p-3">Name</th>
-                        <th class="p-3">Email</th>
-                        <th class="p-3">Grade</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Student ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead class="text-right">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow
                         v-for="student in props.students.data"
                         :key="student.id"
-                        class="border-t"
                     >
-                        <td class="p-3">{{ student.student_id }}</td>
-                        <td class="p-3">
+                        <TableCell>{{ student.student_id }}</TableCell>
+                        <TableCell>
                             {{ student.first_name }} {{ student.last_name }}
-                        </td>
-                        <td class="p-3">{{ student.email }}</td>
-                        <td class="p-3">{{ student.grade_level }}</td>
-                        <td class="p-3 capitalize">{{ student.status }}</td>
-                        <td class="space-x-2 p-3 text-right">
+                        </TableCell>
+                        <TableCell>{{ student.email }}</TableCell>
+                        <TableCell>{{ student.grade_level }}</TableCell>
+                        <TableCell class="capitalize">
+                            {{ student.status }}
+                        </TableCell>
+                        <TableCell class="text-right">
                             <Link
                                 :href="studentsRoutes.edit(student.id).url"
                                 class="text-sm underline"
@@ -82,33 +100,73 @@ function destroy(student: Student) {
                             >
                                 Delete
                             </button>
-                        </td>
-                    </tr>
-                    <tr v-if="props.students.data.length === 0">
-                        <td
+                        </TableCell>
+                    </TableRow>
+                    <TableRow v-if="props.students.data.length === 0">
+                        <TableCell
                             colspan="6"
-                            class="p-6 text-center text-muted-foreground"
+                            class="text-center text-muted-foreground"
                         >
                             No students yet.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-            <Link
-                v-for="link in props.students.links"
-                :key="link.label"
-                :href="link.url ?? ''"
-                v-html="link.label"
-                class="rounded px-3 py-1 text-sm"
-                :class="{
-                    'bg-primary text-primary-foreground': link.active,
-                    'pointer-events-none opacity-50': !link.url,
-                    'hover:bg-muted': link.url && !link.active,
-                }"
-            />
-        </div>
+        <Pagination
+            :total="props.students.total"
+            :sibling-count="1"
+            show-edges
+            :default-page="props.students.current_page"
+            :items-per-page="props.students.per_page"
+        >
+            <PaginationContent>
+                <template v-for="(link, index) in props.students.links" :key="index">
+                    <!-- Previous Button -->
+                    <template v-if="index === 0">
+                        <PaginationPrevious
+                            v-if="link.url"
+                            as-child
+                        >
+                            <Link :href="link.url" />
+                        </PaginationPrevious>
+                        <PaginationPrevious
+                            v-else
+                            disabled
+                        />
+                    </template>
+
+                    <!-- Next Button -->
+                    <template v-else-if="index === props.students.links.length - 1">
+                        <PaginationNext
+                            v-if="link.url"
+                            as-child
+                        >
+                            <Link :href="link.url" />
+                        </PaginationNext>
+                        <PaginationNext
+                            v-else
+                            disabled
+                        />
+                    </template>
+
+                    <!-- Ellipsis -->
+                    <PaginationEllipsis v-else-if="link.label === '...'" />
+
+                    <!-- Page Links -->
+                    <PaginationItem
+                        v-else
+                        :value="Number(link.label)"
+                        as-child
+                        :isActive="link.active"
+                    >
+                        <Link :href="link.url || ''">
+                            {{ link.label }}
+                        </Link>
+                    </PaginationItem>
+                </template>
+            </PaginationContent>
+        </Pagination>
     </div>
 </template>
