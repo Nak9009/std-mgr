@@ -17,12 +17,27 @@ class StudentController extends Controller
     public function index()
     {
         $students = Student::query()
+            ->when(request('search'), function ($query, $search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('student_id', 'like', "%{$search}%");
+                });
+            })
+            ->when(request('status'), function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->when(request('grade_level'), function ($query, $gradeLevel) {
+                $query->where('grade_level', $gradeLevel);
+            })
             ->orderBy('last_name')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('students/Index', [
             'students' => $students,
+            'filters' => request()->only(['search', 'status', 'grade_level']),
         ]);
     }
 
