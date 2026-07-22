@@ -3,6 +3,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { dashboard } from '@/routes';
 import type { PaginatedStudents, Student } from '@/types';
 import * as studentsRoutes from '@/routes/students';
+import { ref } from 'vue';
 
 const props = defineProps<{
     student: Student;
@@ -17,7 +18,18 @@ const form = useForm({
     date_of_birth: props.student.date_of_birth ?? '',
     grade_level: props.student.grade_level,
     status: props.student.status,
+    photo: null as File | null,
 });
+
+const photoPreview = ref<string | null>(props.student.photo_url ?? null);
+
+function onPhotoChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    form.photo = file;
+    photoPreview.value = file
+        ? URL.createObjectURL(file)
+        : (props.student.photo_url ?? null);
+}
 
 defineOptions({
     layout: {
@@ -38,8 +50,14 @@ defineOptions({
     },
 });
 
+// function submit() {
+//     form.put(studentsRoutes.update(props.student.id).url);
+// }
+
 function submit() {
-    form.put(studentsRoutes.update(props.student.id).url);
+    form.transform((data) => ({ ...data, _method: 'put' })).post(
+        studentsRoutes.update(props.student.id).url,
+    );
 }
 </script>
 
@@ -132,7 +150,27 @@ function submit() {
                         </select>
                     </div>
                 </div>
-
+                <div class="space-y-1">
+                    <Label for="photo">Photo</Label>
+                    <img
+                        v-if="photoPreview"
+                        :src="photoPreview"
+                        class="h-20 w-20 rounded-full object-cover"
+                    />
+                    <input
+                        id="photo"
+                        type="file"
+                        accept="image/*"
+                        @change="onPhotoChange"
+                        class="text-sm"
+                    />
+                    <p
+                        v-if="form.errors.photo"
+                        class="text-sm text-destructive"
+                    >
+                        {{ form.errors.photo }}
+                    </p>
+                </div>
                 <Button type="submit" :disabled="form.processing"
                     >Update Student</Button
                 >

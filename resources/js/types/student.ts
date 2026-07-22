@@ -10,6 +10,8 @@ export interface Student {
     status: 'active' | 'inactive' | 'graduated';
     created_at: string;
     updated_at: string;
+    photo_url: string | null;
+    photo: string | null;
 }
 
 export interface PaginatedStudents {

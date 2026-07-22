@@ -12,6 +12,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
+import { ref } from 'vue';
 
 const form = useForm({
     first_name: '',
@@ -22,7 +23,16 @@ const form = useForm({
     date_of_birth: '',
     grade_level: '',
     status: 'active',
+    photo: null as File | null,
 });
+
+const photoPreview = ref<string | null>(null);
+
+function onPhotoChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    form.photo = file;
+    photoPreview.value = file ? URL.createObjectURL(file) : null;
+}
 
 function submit() {
     form.post(studentsRoutes.store().url);
@@ -48,18 +58,6 @@ defineOptions({
     >
         <h1 class="text-2xl font-semibold">Add Student</h1>
 
-        <FormField v-slot="{ componentField }" name="first_name">
-            <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                    <Input v-model="form.first_name" />
-                </FormControl>
-                <FormDescription>
-                    This is your public display name.
-                </FormDescription>
-                <FormMessage />
-            </FormItem>
-        </FormField>
         <form class="space-y-4" @submit.prevent="submit">
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
@@ -160,6 +158,24 @@ defineOptions({
                         {{ form.errors.status }}
                     </p>
                 </div>
+            </div>
+            <div class="space-y-1">
+                <Label for="photo">Photo</Label>
+                <input
+                    id="photo"
+                    type="file"
+                    accept="image/*"
+                    @change="onPhotoChange"
+                    class="text-sm"
+                />
+                <img
+                    v-if="photoPreview"
+                    :src="photoPreview"
+                    class="mt-2 h-20 w-20 rounded-full object-cover"
+                />
+                <p v-if="form.errors.photo" class="text-sm text-destructive">
+                    {{ form.errors.photo }}
+                </p>
             </div>
 
             <Button type="submit" :disabled="form.processing"

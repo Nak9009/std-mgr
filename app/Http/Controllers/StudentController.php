@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
 use Inertia\Inertia;
 use PHPUnit\TextUI\Configuration\Constant;
+use Storage;
 
 class StudentController extends Controller
 {
@@ -38,7 +39,13 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
-        Student::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        Student::create($data);
 
         return to_route('students.index')->with('success', 'Student created successfully.');
     }
@@ -66,7 +73,17 @@ class StudentController extends Controller
      */
     public function update(UpdateStudentRequest $request, Student $student)
     {
-        $student->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            if ($student->photo) {
+                Storage::disk('public')->delete($student->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        $student->update($data);
 
         return to_route('students.index')->with('success', 'Student updated successfully.');
     }
@@ -76,6 +93,10 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        if ($student->photo) {
+            Storage::disk('public')->delete($student->photo);
+        }
+
         $student->delete();
 
         return to_route('students.index')->with('success', 'Student deleted successfully.');

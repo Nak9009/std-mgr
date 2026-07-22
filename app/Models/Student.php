@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class Student extends Model
 {
@@ -18,7 +20,9 @@ class Student extends Model
         'date_of_birth',
         'grade_level',
         'status',
+        'photo',
     ];
+
 
     protected function casts(): array
     {
@@ -31,4 +35,14 @@ class Student extends Model
     {
         return "{$this->first_name}{$this->last_name}";
     }
+
+    protected function photoUrl(): Attribute
+    {
+        return Attribute::get(
+            fn () => $this->photo ? Storage::disk('public')->url($this->photo) : null,
+        );
+    }
+
+    protected $appends = ['photo_url'];
+
 }

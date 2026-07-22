@@ -29,11 +29,12 @@ class UpdateStudentRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('students', 'email')->ignore($studentId)],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'min:8', 'max:20'],
             'student_id' => ['required', 'string', 'max:50', Rule::unique('students', 'student_id')->ignore($studentId)],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'grade_level' => ['required', 'string', 'max:20'],
             'status' => ['required', 'in:active,inactive,graduated'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }
