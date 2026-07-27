@@ -16,6 +16,8 @@ const form = useForm({
     grade_level: '',
     status: 'active',
     photo: null as File | null,
+    base64: null as string | null,
+    blob: null as string | null,
 });
 
 function submit() {
@@ -47,10 +49,10 @@ defineOptions({
     >
         <div class="max-w-3xl space-y-6">
             <h1 class="text-2xl font-semibold">Add Student</h1>
-            <StudentForm 
-                :form="form" 
-                @submit="submit" 
-                submitText="Save Student" 
+            <StudentForm
+                :form="form"
+                @submit="submit"
+                submitText="Save Student"
             />
         </div>
     </div>

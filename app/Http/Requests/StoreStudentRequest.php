@@ -32,6 +32,8 @@ class StoreStudentRequest extends FormRequest
             'grade_level' => ['required', 'string', 'max:20'],
             'status' => ['required', 'in:active,inactive,graduated'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'base64' => ['nullable', 'string'],
+            'blob' => ['nullable', 'string'],
         ];
     }
 }

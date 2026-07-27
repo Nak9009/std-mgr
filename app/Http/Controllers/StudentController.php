@@ -18,11 +18,11 @@ class StudentController extends Controller
     {
         $students = Student::query()
             ->when(request('search'), function ($query, $search) {
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('student_id', 'like', "%{$search}%");
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('student_id', 'like', "%{$search}%");
                 });
             })
             ->when(request('status'), function ($query, $status) {
@@ -58,6 +58,18 @@ class StudentController extends Controller
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        // Upload Base64
+        if ($request->has('base64')) {
+            $base64 = $request->base64;
+            $data['base64'] = $base64;
+        }
+
+        // Upload Blob
+        if ($request->has('blob')) {
+            $blob = $request->blob;
+            $data['blob'] = $blob;
         }
 
         Student::create($data);

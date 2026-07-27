@@ -21,6 +21,8 @@ class Student extends Model
         'grade_level',
         'status',
         'photo',
+        'base64',
+        'blob',
     ];
 
 

@@ -12,6 +12,8 @@ export interface Student {
     updated_at: string;
     photo_url: string | null;
     photo: string | null;
+    base64: string | null;
+    blob: string | null;
 }
 
 export interface PaginatedStudents {
